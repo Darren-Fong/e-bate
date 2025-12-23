@@ -5,9 +5,9 @@ const rooms = new Map<string, { topic: string; creator: string }>();
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
-  const roomCode = params.code;
+  const { code: roomCode } = await params;
   const room = rooms.get(roomCode);
 
   if (!room) {
