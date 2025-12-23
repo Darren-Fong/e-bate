@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { pusherClient } from "@/lib/pusher-client";
 
 type RoomStage = "lobby" | "waiting" | "debate" | "finished";
 type Turn = "player1" | "player2";
@@ -17,26 +18,101 @@ export default function RealtimeDebate() {
   const [myArgument, setMyArgument] = useState("");
   const [transcript, setTranscript] = useState<Array<{speaker: string, text: string, round: number}>>([]);
   const [spectatorCount, setSpectatorCount] = useState(0);
+  const [opponent, setOpponent] = useState<string | null>(null);
+  const [myRole, setMyRole] = useState<"player1" | "player2" | null>(null);
 
-  const createRoom = () => {
+  useEffect(() => {
+    if (roomCode && stage !== "lobby") {
+      const channel = pusherClient.subscribe(`room-${roomCode}`);
+
+      channel.bind("user-joined", (data: { username: string }) => {
+        if (data.username !== username) {
+          setOpponent(data.username);
+          if (stage === "waiting") {
+            setStage("debate");
+          }
+        }
+      });
+
+      channel.bind("argument-submitted", (data: { username: string; argument: string; round: number }) => {
+        if (data.username !== username) {
+          setTranscript(prev => [...prev, { 
+            speaker: data.username, 
+            text: data.argument, 
+            round: data.round 
+          }]);
+          
+          // Switch turn
+          setCurrentTurn(prev => prev === "player1" ? "player2" : "player1");
+          setTimeRemaining(180);
+        }
+      });
+
+      return () => {
+        channel.unbind_all();
+        channel.unsubscribe();
+      };
+    }
+  }, [roomCode, stage, username]);
+
+  const createRoom = async () => {
     if (username && topic) {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       setRoomCode(code);
+      setMyRole("player1");
       setStage("waiting");
-      // In real app: create room on backend
+      
+      // Create room on backend
+      try {
+        await fetch("/api/debate/create-room", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roomCode: code, topic }),
+        });
+      } catch (error) {
+        console.error("Failed to create room:", error);
+      }
     }
   };
 
-  const joinRoom = () => {
+  const joinRoom = async () => {
     if (username && roomCode) {
+      setMyRole("player2");
       setStage("debate");
-      // In real app: join existing room via WebSocket
-      setTopic("Sample debate topic");
+      
+      // Join room on backend
+      try {
+        await fetch("/api/debate/join-room", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roomCode, username }),
+        });
+      } catch (error) {
+        console.error("Failed to join room:", error);
+      }
     }
   };
 
-  const submitArgument = () => {
-    setTranscript([...transcript, { speaker: username, text: myArgument, round }]);
+  const submitArgument = async () => {
+    const newEntry = { speaker: username, text: myArgument, round };
+    setTranscript([...transcript, newEntry]);
+    
+    // Send to backend
+    try {
+      await fetch("/api/debate/submit-argument", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          roomCode, 
+          username, 
+          argument: myArgument, 
+          round 
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to submit argument:", error);
+    }
+    
     setMyArgument("");
     
     // Switch turns
@@ -51,8 +127,8 @@ export default function RealtimeDebate() {
     }
   };
 
-  const isMyTurn = (username === "Player1" && currentTurn === "player1") || 
-                   (username === "Player2" && currentTurn === "player2");
+  const isMyTurn = (myRole === "player1" && currentTurn === "player1") || 
+                   (myRole === "player2" && currentTurn === "player2");
 
   return (
     <div className="debate-container">
