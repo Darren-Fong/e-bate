@@ -40,6 +40,12 @@ export default function RealtimeDebate() {
         }
       });
 
+      channel.bind("room-created", (data: { topic: string; roomCode: string }) => {
+        if (!topic) {
+          setTopic(data.topic);
+        }
+      });
+
       channel.bind("argument-submitted", (data: { username: string; argument: string; round: number }) => {
         if (data.username !== username) {
           setTranscript(prev => [...prev, { 
@@ -84,7 +90,7 @@ export default function RealtimeDebate() {
   const joinRoom = async () => {
     if (username && roomCode) {
       setMyRole("player2");
-      setStage("debate");
+      setStage("waiting");  // Set to waiting first
       
       // Join room on backend
       try {
@@ -93,8 +99,10 @@ export default function RealtimeDebate() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ roomCode, username }),
         });
+        // Once joined, it will move to debate when room-created event arrives
       } catch (error) {
         console.error("Failed to join room:", error);
+        setStage("lobby");
       }
     }
   };
@@ -206,14 +214,18 @@ export default function RealtimeDebate() {
 
       {stage === "waiting" && (
         <div className="waiting-room">
-          <h2>Waiting for Opponent...</h2>
-          <div className="room-code-display">
-            <p>Share this code with your opponent:</p>
-            <div className="code-box">{roomCode}</div>
-          </div>
-          <div className="topic-display">
-            <strong>Topic:</strong> {topic}
-          </div>
+          <h2>{myRole === "player1" ? "Waiting for Opponent..." : "Joining Room..."}</h2>
+          {myRole === "player1" && (
+            <div className="room-code-display">
+              <p>Share this code with your opponent:</p>
+              <div className="code-box">{roomCode}</div>
+            </div>
+          )}
+          {topic && (
+            <div className="topic-display">
+              <strong>Topic:</strong> {topic}
+            </div>
+          )}
           <div className="spinner">⏳</div>
           <button className="btn-secondary" onClick={() => setStage("lobby")}>
             Cancel
