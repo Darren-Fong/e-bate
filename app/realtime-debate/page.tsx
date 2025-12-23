@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { pusherClient } from "@/lib/pusher-client";
+import { getPusherClient } from "@/lib/pusher-client";
 
 type RoomStage = "lobby" | "waiting" | "debate" | "finished";
 type Turn = "player1" | "player2";
@@ -23,7 +23,13 @@ export default function RealtimeDebate() {
 
   useEffect(() => {
     if (roomCode && stage !== "lobby") {
-      const channel = pusherClient.subscribe(`room-${roomCode}`);
+      const client = getPusherClient();
+      if (!client) {
+        console.error("Pusher not available");
+        return;
+      }
+
+      const channel = client.subscribe(`room-${roomCode}`);
 
       channel.bind("user-joined", (data: { username: string }) => {
         if (data.username !== username) {
