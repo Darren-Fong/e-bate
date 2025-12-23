@@ -90,16 +90,33 @@ export default function RealtimeDebate() {
   const joinRoom = async () => {
     if (username && roomCode) {
       setMyRole("player2");
-      setStage("waiting");  // Set to waiting first
+      setStage("waiting");
       
-      // Join room on backend
+      // Subscribe to channel first to receive events
+      const client = getPusherClient();
+      if (client) {
+        const channel = client.subscribe(`room-${roomCode}`);
+        
+        // Listen for room data
+        channel.bind("room-created", (data: { topic: string }) => {
+          setTopic(data.topic);
+          setStage("debate");
+        });
+        
+        channel.bind("user-joined", (data: { username: string }) => {
+          if (data.username !== username) {
+            setOpponent(data.username);
+          }
+        });
+      }
+      
+      // Then join room on backend
       try {
         await fetch("/api/debate/join-room", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ roomCode, username }),
         });
-        // Once joined, it will move to debate when room-created event arrives
       } catch (error) {
         console.error("Failed to join room:", error);
         setStage("lobby");
