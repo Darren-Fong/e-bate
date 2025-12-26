@@ -156,8 +156,6 @@ export default function AIDebate() {
       {stage === "setup" && (
         <div className="setup-panel">
           <h2>Setup Your Debate</h2>
-        <div className="setup-panel">
-          <h2>Setup Your Debate</h2>
           
           <div className="form-group">
             <label>Enter Your Debate Topic:</label>
