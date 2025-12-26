@@ -1,9 +1,5 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY || "dummy-key-for-build",
-  baseURL: "https://api.deepseek.com",
-});
+// This file is no longer used - AI functions moved to API routes
+// Keeping for reference only
 
 export async function generateAIArgument(
   topic: string,
