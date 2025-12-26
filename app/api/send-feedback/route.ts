@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         from: "E-Bate Feedback <onboarding@resend.dev>",
-        to: ["mail@darrenfong.net"],
+        to: ["fongdarren1002@icloud.com"],
         subject: `E-Bate Feedback from ${name}`,
+        reply_to: email,
         html: `
           <h2>New Feedback Submission</h2>
           <p><strong>From:</strong> ${name} (${email})</p>
