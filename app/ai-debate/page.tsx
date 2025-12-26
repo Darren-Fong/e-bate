@@ -120,37 +120,41 @@ export default function AIDebate() {
       setAIArgument(aiResponse);
       setTranscript(prev => [...prev, { speaker: "AI", text: aiResponse, round }]);
       setIsLoading(false);
-      
-      // Wait a moment before moving to next round or finishing
-      setTimeout(async () => {
-        if (round < 3) {
-          setRound(round + 1);
-          setStage("user-turn");
-          setTimeRemaining(300);
-        } else {
-          // Generate feedback at end of debate
-          const feedbackResponse = await fetch("/api/ai/generate-feedback", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              topic: topic,
-              transcript: [...newTranscript, { speaker: "AI", text: aiResponse, round }]
-            })
-          });
-          
-          if (feedbackResponse.ok) {
-            const feedbackData = await feedbackResponse.json();
-            setFeedback(feedbackData);
-          }
-          
-          setStage("finished");
-        }
-      }, 2000);
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
       setAIArgument("Sorry, I encountered an error. Please try again.");
-      setTimeout(() => setStage("user-turn"), 2000);
+    }
+  };
+
+  const proceedToNext = async () => {
+    if (round < 3) {
+      setRound(round + 1);
+      setStage("user-turn");
+      setTimeRemaining(300);
+      setAIArgument("");
+    } else {
+      // Generate feedback at end of debate
+      setIsLoading(true);
+      try {
+        const feedbackResponse = await fetch("/api/ai/generate-feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: topic,
+            transcript: transcript
+          })
+        });
+        
+        if (feedbackResponse.ok) {
+          const feedbackData = await feedbackResponse.json();
+          setFeedback(feedbackData);
+        }
+      } catch (error) {
+        console.error("Error generating feedback:", error);
+      }
+      setIsLoading(false);
+      setStage("finished");
     }
   };
 
@@ -266,7 +270,17 @@ export default function AIDebate() {
                 <div className="spinner-dot"></div>
               </div>
             ) : (
-              <p>{aiArgument}</p>
+              <>
+                <p>{aiArgument}</p>
+                <div className="action-buttons">
+                  <button 
+                    className="btn-primary"
+                    onClick={proceedToNext}
+                  >
+                    {round < 3 ? `Continue to Round ${round + 1} →` : 'View Results →'}
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
