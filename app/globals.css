@@ -455,14 +455,14 @@ textarea {
 }
 
 .dashboard-header h1 {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 4px;
 }
 
 .dashboard-subtitle {
-  font-size: 21px;
+  font-size: 17px;
   color: var(--text-muted);
 }
 
@@ -497,12 +497,12 @@ textarea {
 }
 
 .stat-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 32px;
+  margin-bottom: 12px;
 }
 
 .stat-number {
-  font-size: 56px;
+  font-size: 36px;
   font-weight: 700;
   color: var(--text-dark);
   line-height: 1;
@@ -510,14 +510,14 @@ textarea {
 }
 
 .stat-label {
-  font-size: 17px;
+  font-size: 14px;
   color: var(--text-muted);
   font-weight: 400;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .dashboard-actions h2 {
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 32px;
@@ -541,19 +541,19 @@ textarea {
 }
 
 .action-icon {
-  font-size: 56px;
-  margin-bottom: 16px;
+  font-size: 40px;
+  margin-bottom: 12px;
 }
 
 .action-card-dash h3 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 8px;
 }
 
 .action-card-dash p {
-  font-size: 17px;
+  font-size: 15px;
   color: var(--text-muted);
 }
 
@@ -1654,7 +1654,7 @@ textarea {
   }
   
   .dashboard-header h1 {
-    font-size: 32px;
+    font-size: 24px;
   }
   
   .stats-grid {
@@ -1663,7 +1663,7 @@ textarea {
   }
   
   .stat-number {
-    font-size: 40px;
+    font-size: 28px;
   }
   
   .action-grid {

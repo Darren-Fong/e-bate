@@ -55,7 +55,7 @@ export default function Contact() {
           <div className="contact-details">
             <div className="contact-item">
               <h3>Email</h3>
-              <p>support@ebate.com</p>
+              <p>mail@darrenfong.net</p>
             </div>
             <div className="contact-item">
               <h3>Response Time</h3>
