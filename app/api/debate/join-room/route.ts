@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pusher } from "@/lib/pusher-server";
-
-// Shared room storage (in production, use a database)
-const rooms = new Map<string, { topic: string; creator: string }>();
+import { rooms } from "@/lib/room-storage";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,5 +31,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to join room" }, { status: 500 });
   }
 }
-
-export { rooms };

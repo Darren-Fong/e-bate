@@ -8,6 +8,7 @@ type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 export default function AIDebate() {
   const [stage, setStage] = useState<DebateStage>("setup");
   const [topic, setTopic] = useState("");
+  const [customTopic, setCustomTopic] = useState("");
   const [userSide, setUserSide] = useState<"for" | "against">("for");
   const [userArgument, setUserArgument] = useState("");
   const [aiArgument, setAIArgument] = useState("");
@@ -25,8 +26,10 @@ export default function AIDebate() {
     "Climate change is the biggest threat to humanity"
   ];
 
+  const finalTopic = customTopic.trim() || topic;
+
   const startDebate = () => {
-    if (topic) {
+    if (finalTopic) {
       setStage("user-turn");
       setTimeRemaining(180);
       setTranscript([]);
@@ -48,7 +51,7 @@ export default function AIDebate() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          topic,
+          topic: finalTopic,
           userSide,
           userArgument,
           round,
@@ -77,7 +80,7 @@ export default function AIDebate() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              topic,
+              topic: finalTopic,
               transcript: [...newTranscript, { speaker: "AI", text: aiResponse, round }]
             })
           });
@@ -112,7 +115,10 @@ export default function AIDebate() {
             <label>Choose a Topic:</label>
             <select 
               value={topic} 
-              onChange={(e) => setTopic(e.target.value)}
+              onChange={(e) => {
+                setTopic(e.target.value);
+                if (e.target.value) setCustomTopic("");
+              }}
               className="select-input"
             >
               <option value="">-- Select a topic --</option>
@@ -120,6 +126,20 @@ export default function AIDebate() {
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group">
+            <label>Or Enter Your Own Topic:</label>
+            <input
+              type="text"
+              value={customTopic}
+              onChange={(e) => {
+                setCustomTopic(e.target.value);
+                if (e.target.value) setTopic("");
+              }}
+              placeholder="e.g., Universal basic income is necessary"
+              className="select-input"
+            />
           </div>
 
           <div className="form-group">
@@ -147,9 +167,9 @@ export default function AIDebate() {
           </div>
 
           <button 
-            className="btn-primary" 
+            className="btn-primary"
             onClick={startDebate}
-            disabled={!topic}
+            disabled={!finalTopic}
           >
             Start Debate
           </button>
@@ -164,7 +184,7 @@ export default function AIDebate() {
           </div>
           
           <div className="topic-display">
-            <strong>Topic:</strong> {topic}
+            <strong>Topic:</strong> {finalTopic}
           </div>
 
           <div className="input-area">
@@ -246,7 +266,8 @@ export default function AIDebate() {
                   </ul>
                 </div>
                 <div className="feedback-group">
-                  <h4>💡 Areas to Improve</h4>
+                 CustomTopic("");
+              set <h4>💡 Areas to Improve</h4>
                   <ul>
                     {feedback.improvements.map((improvement, idx) => (
                       <li key={idx}>{improvement}</li>
@@ -263,6 +284,7 @@ export default function AIDebate() {
             <button className="btn-primary" onClick={() => {
               setStage("setup");
               setTopic("");
+              setCustomTopic("");
               setRound(1);
               setTranscript([]);
               setFeedback(null);

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pusher } from "@/lib/pusher-server";
-
-// In-memory storage for rooms (use database in production)
-const rooms = new Map<string, { topic: string; creator: string }>();
+import { rooms } from "@/lib/room-storage";
 
 export async function POST(req: NextRequest) {
   try {
     const { roomCode, topic } = await req.json();
 
     // Store room data
-    rooms.set(roomCode, { topic, creator: "player1" });
+    rooms.set(roomCode, { topic, creator: "player1", createdAt: Date.now() });
 
     // Trigger event to notify room was created
     await pusher.trigger(`room-${roomCode}`, "room-created", {
@@ -22,6 +20,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create room" }, { status: 500 });
   }
 }
-
-// Export rooms for other routes to access
-export { rooms };
