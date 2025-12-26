@@ -466,6 +466,17 @@ textarea {
   color: var(--text-muted);
 }
 
+.dashboard-trials {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.dashboard-trials strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

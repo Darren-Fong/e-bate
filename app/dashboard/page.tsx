@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getTrialsRemaining, isAdmin } from "@/lib/access-control";
 
 interface DebateStats {
   totalDebates: number;
@@ -23,6 +24,7 @@ export default function DashboardPage() {
     munDebates: 0,
     lastDebateDate: null,
   });
+  const [trialsRemaining, setTrialsRemaining] = useState<number | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -32,6 +34,13 @@ export default function DashboardPage() {
       
       if (savedStats) {
         setStats(JSON.parse(savedStats));
+      }
+
+      // Load trial count
+      const userEmail = user.primaryEmailAddress?.emailAddress;
+      if (!isAdmin(userEmail)) {
+        const remaining = getTrialsRemaining(userId, userEmail);
+        setTrialsRemaining(remaining);
       }
     }
   }, [user]);
@@ -79,6 +88,11 @@ export default function DashboardPage() {
             <div>
               <h1>Welcome back, {user.firstName || user.username}! 👋</h1>
               <p className="dashboard-subtitle">Here's your debate journey</p>
+              {trialsRemaining !== null && (
+                <p className="dashboard-trials">
+                  🎯 AI Practice rounds remaining: <strong>{trialsRemaining}</strong> / 5
+                </p>
+              )}
             </div>
           </div>
         </div>
