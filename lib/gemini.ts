@@ -1,6 +1,9 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyC6otExy3MxZvoKQaN1Lvc1mrmEp05FWco");
+const openai = new OpenAI({
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: "https://api.deepseek.com",
+});
 
 export async function generateAIArgument(
   topic: string,
@@ -10,8 +13,6 @@ export async function generateAIArgument(
   conversationHistory: Array<{ speaker: string; text: string; round: number }>
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
     const aiSide = userSide === "for" ? "against" : "for";
     
     // Build conversation context
@@ -40,9 +41,16 @@ Instructions:
 
 Your response:`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const completion = await openai.chat.completions.create({
+      model: "deepseek-chat",
+      messages: [
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 400,
+    });
+
+    return completion.choices[0].message.content || "Unable to generate response.";
   } catch (error) {
     console.error("Error generating AI argument:", error);
     throw new Error("Failed to generate AI response. Please try again.");
@@ -58,8 +66,6 @@ export async function generateDebateFeedback(
   score: number;
 }> {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
     const transcriptText = transcript
       .map((entry) => `Round ${entry.round} - ${entry.speaker}: ${entry.text}`)
       .join("\n\n");
@@ -87,9 +93,16 @@ Focus on:
 
 Return only valid JSON, no additional text.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const completion = await openai.chat.completions.create({
+      model: "deepseek-chat",
+      messages: [
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 500,
+    });
+
+    const text = completion.choices[0].message.content || "";
     
     // Try to parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
