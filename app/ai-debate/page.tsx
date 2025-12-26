@@ -4,11 +4,12 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { trackDebate } from "@/lib/debate-tracker";
+import { canAccessPracticeMode, getTrialsRemaining, incrementTrialCount, isAdmin } from "@/lib/access-control";
 
 type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 
 export default function AIDebate() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [stage, setStage] = useState<DebateStage>("setup");
   const [topic, setTopic] = useState("");
   const [userSide, setUserSide] = useState<"for" | "against">("for");
@@ -20,11 +21,32 @@ export default function AIDebate() {
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{strengths: string[], improvements: string[], score: number} | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [trialsRemaining, setTrialsRemaining] = useState<number>(0);
+  const [hasAccess, setHasAccess] = useState(true);
+
+  // Check access on mount and when user changes
+  useEffect(() => {
+    if (user?.id) {
+      const userEmail = user.primaryEmailAddress?.emailAddress;
+      const remaining = getTrialsRemaining(user.id, userEmail);
+      const access = canAccessPracticeMode(user.id, userEmail);
+      setTrialsRemaining(remaining);
+      setHasAccess(access);
+    }
+  }, [user]);
 
   const startDebate = () => {
     if (topic.trim()) {
-      // Track debate participation
+      // Increment trial count for non-admin users
       if (user?.id) {
+        const userEmail = user.primaryEmailAddress?.emailAddress;
+        incrementTrialCount(user.id, userEmail);
+        
+        // Update remaining trials display
+        const remaining = getTrialsRemaining(user.id, userEmail);
+        setTrialsRemaining(remaining);
+        
+        // Track debate participation
         trackDebate(user.id, 'ai');
       }
       setStage("user-turn");
@@ -164,18 +186,41 @@ export default function AIDebate() {
       
       <h1 className="page-title">AI Debate Mode</h1>
 
-      {stage === "setup" && (
-        <div className="setup-panel">
-          <h2>Setup Your Debate</h2>
-          
-          <div className="form-group">
-            <label>Enter Your Debate Topic:</label>
-            <input
-              type="text"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="e.g., Social media does more harm than good"
-              className="select-input"
+      {!isLoaded ? (
+        <div className="loading-spinner">
+          <div className="spinner-dot"></div>
+          <div className="spinner-dot"></div>
+          <div className="spinner-dot"></div>
+        </div>
+      ) : !hasAccess ? (
+        <div className="auth-required">
+          <h2>🔒 Trial Limit Reached</h2>
+          <p>You've used all {5} free practice rounds.</p>
+          <p>Thank you for trying E-Bate! This is currently a free demo version.</p>
+          <Link href="/" className="btn-primary">
+            Back to Home
+          </Link>
+        </div>
+      ) : (
+        <>
+          {stage === "setup" && (
+            <div className="setup-panel">
+              <h2>Setup Your Debate</h2>
+              
+              {!isAdmin(user?.primaryEmailAddress?.emailAddress) && trialsRemaining < Infinity && (
+                <div className="trial-notice">
+                  <p>🎯 Practice rounds remaining: <strong>{trialsRemaining}</strong></p>
+                </div>
+              )}
+              
+              <div className="form-group">
+                <label>Enter Your Debate Topic:</label>
+                <input
+                  type="text"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  placeholder="e.g., Social media does more harm than good"
+                  className="select-input"
             />
           </div>
 
@@ -345,6 +390,8 @@ export default function AIDebate() {
             <Link href="/" className="btn-secondary">Back to Home</Link>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
