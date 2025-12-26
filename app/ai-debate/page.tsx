@@ -151,7 +151,7 @@ export default function AIDebate() {
     <div className="debate-container">
       <Link href="/" className="back-link">← Back to Home</Link>
       
-      <h1 className="page-title">🤖 AI Debate Mode</h1>
+      <h1 className="page-title">AI Debate Mode</h1>
 
       {stage === "setup" && (
         <div className="setup-panel">

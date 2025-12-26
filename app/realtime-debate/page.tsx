@@ -222,7 +222,7 @@ export default function RealtimeDebate() {
     <div className="debate-container">
       <Link href="/" className="back-link">← Back to Home</Link>
       
-      <h1 className="page-title">👥 Real-Time Debate Mode</h1>
+      <h1 className="page-title">Real-Time Debate Mode</h1>
 
       {stage === "lobby" && (
         <div className="lobby-panel">
