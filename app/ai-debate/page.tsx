@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { generateAIArgument, generateDebateFeedback } from "@/lib/gemini";
 
 type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 
@@ -44,23 +43,50 @@ export default function AIDebate() {
     setIsLoading(true);
     
     try {
-      // Call actual Gemini AI
-      const aiResponse = await generateAIArgument(topic, userSide, userArgument, round, newTranscript);
+      // Call API route
+      const response = await fetch("/api/ai/generate-argument", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic,
+          userSide,
+          userArgument,
+          round,
+          conversationHistory: newTranscript
+        })
+      });
+
+      if (!response.ok) throw new Error("Failed to generate response");
+      
+      const data = await response.json();
+      const aiResponse = data.response;
+      
       setAIArgument(aiResponse);
       setTranscript(prev => [...prev, { speaker: "AI", text: aiResponse, round }]);
       setIsLoading(false);
       
       // Wait a moment before moving to next round or finishing
-      setTimeout(() => {
+      setTimeout(async () => {
         if (round < 3) {
           setRound(round + 1);
           setStage("user-turn");
           setTimeRemaining(180);
         } else {
           // Generate feedback at end of debate
-          generateDebateFeedback(topic, [...newTranscript, { speaker: "AI", text: aiResponse, round }])
-            .then(setFeedback)
-            .catch(console.error);
+          const feedbackResponse = await fetch("/api/ai/generate-feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              topic,
+              transcript: [...newTranscript, { speaker: "AI", text: aiResponse, round }]
+            })
+          });
+          
+          if (feedbackResponse.ok) {
+            const feedbackData = await feedbackResponse.json();
+            setFeedback(feedbackData);
+          }
+          
           setStage("finished");
         }
       }, 2000);
