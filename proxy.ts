@@ -1,6 +1,8 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 
-export default clerkMiddleware();
+export default clerkMiddleware({
+  debug: false, // Hides the development mode indicator
+});
 
 export const config = {
   matcher: [

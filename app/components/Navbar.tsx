@@ -34,6 +34,14 @@ export default function Navbar() {
           >
             Modes
           </Link>
+          <SignedIn>
+            <Link 
+              href="/dashboard" 
+              className={`navbar-link ${pathname === "/dashboard" ? "active" : ""}`}
+            >
+              Dashboard
+            </Link>
+          </SignedIn>
           <Link 
             href="/feedback" 
             className={`navbar-link ${pathname === "/feedback" ? "active" : ""}`}

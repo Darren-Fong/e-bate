@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { trackDebate } from "@/lib/debate-tracker";
 
 type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 
 export default function AIDebate() {
+  const { user } = useUser();
   const [stage, setStage] = useState<DebateStage>("setup");
   const [topic, setTopic] = useState("");
   const [userSide, setUserSide] = useState<"for" | "against">("for");
@@ -20,6 +23,10 @@ export default function AIDebate() {
 
   const startDebate = () => {
     if (topic.trim()) {
+      // Track debate participation
+      if (user?.id) {
+        trackDebate(user.id, 'ai');
+      }
       setStage("user-turn");
       setTimeRemaining(300);
       setTranscript([]);
