@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
@@ -8,33 +8,79 @@ type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 export default function AIDebate() {
   const [stage, setStage] = useState<DebateStage>("setup");
   const [topic, setTopic] = useState("");
-  const [customTopic, setCustomTopic] = useState("");
   const [userSide, setUserSide] = useState<"for" | "against">("for");
   const [userArgument, setUserArgument] = useState("");
   const [aiArgument, setAIArgument] = useState("");
-  const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes = 180 seconds
+  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes = 300 seconds
   const [round, setRound] = useState(1);
   const [transcript, setTranscript] = useState<Array<{speaker: string, text: string, round: number}>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{strengths: string[], improvements: string[], score: number} | null>(null);
-
-  const topics = [
-    "Social media does more harm than good",
-    "Remote work is better than office work",
-    "AI will create more jobs than it destroys",
-    "College education should be free",
-    "Climate change is the biggest threat to humanity"
-  ];
-
-  const finalTopic = customTopic.trim() || topic;
+  const [isRecording, setIsRecording] = useState(false);
 
   const startDebate = () => {
-    if (finalTopic) {
+    if (topic.trim()) {
       setStage("user-turn");
-      setTimeRemaining(180);
+      setTimeRemaining(300);
       setTranscript([]);
       setRound(1);
       setFeedback(null);
+    }
+  };
+
+  // Timer countdown
+  useEffect(() => {
+    if (stage === "user-turn" && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [stage, timeRemaining]);
+
+  const startSpeechToText = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join(' ');
+      setUserArgument((prev) => prev + ' ' + transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    if (isRecording) {
+      recognition.stop();
+    } else {
+      recognition.start();
     }
   };
 
@@ -51,7 +97,7 @@ export default function AIDebate() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          topic: finalTopic,
+          topic: topic,
           userSide,
           userArgument,
           round,
@@ -73,14 +119,14 @@ export default function AIDebate() {
         if (round < 3) {
           setRound(round + 1);
           setStage("user-turn");
-          setTimeRemaining(180);
+          setTimeRemaining(300);
         } else {
           // Generate feedback at end of debate
           const feedbackResponse = await fetch("/api/ai/generate-feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              topic: finalTopic,
+              topic: topic,
               transcript: [...newTranscript, { speaker: "AI", text: aiResponse, round }]
             })
           });
@@ -112,32 +158,12 @@ export default function AIDebate() {
           <h2>Setup Your Debate</h2>
           
           <div className="form-group">
-            <label>Choose a Topic:</label>
-            <select 
-              value={topic} 
-              onChange={(e) => {
-                setTopic(e.target.value);
-                if (e.target.value) setCustomTopic("");
-              }}
-              className="select-input"
-            >
-              <option value="">-- Select a topic --</option>
-              {topics.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Or Enter Your Own Topic:</label>
+            <label>Enter Your Debate Topic:</label>
             <input
               type="text"
-              value={customTopic}
-              onChange={(e) => {
-                setCustomTopic(e.target.value);
-                if (e.target.value) setTopic("");
-              }}
-              placeholder="e.g., Universal basic income is necessary"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="e.g., Social media does more harm than good"
               className="select-input"
             />
           </div>
@@ -169,7 +195,7 @@ export default function AIDebate() {
           <button 
             className="btn-primary"
             onClick={startDebate}
-            disabled={!finalTopic}
+            disabled={!topic.trim()}
           >
             Start Debate
           </button>
@@ -184,7 +210,7 @@ export default function AIDebate() {
           </div>
           
           <div className="topic-display">
-            <strong>Topic:</strong> {finalTopic}
+            <strong>Topic:</strong> {topic}
           </div>
 
           <div className="input-area">
@@ -197,7 +223,13 @@ export default function AIDebate() {
             />
             
             <div className="input-controls">
-              <button className="btn-secondary">🎤 Speech-to-Text</button>
+              <button 
+                className="btn-secondary"
+                onClick={startSpeechToText}
+                disabled={isLoading}
+              >
+                {isRecording ? '⏹️ Stop Recording' : '🎤 Speech-to-Text'}
+              </button>
               <button 
                 className="btn-primary"
                 onClick={submitArgument}
@@ -283,7 +315,6 @@ export default function AIDebate() {
             <button className="btn-primary" onClick={() => {
               setStage("setup");
               setTopic("");
-              setCustomTopic("");
               setRound(1);
               setTranscript([]);
               setFeedback(null);

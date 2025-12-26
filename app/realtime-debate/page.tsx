@@ -13,13 +13,14 @@ export default function RealtimeDebate() {
   const [username, setUsername] = useState("");
   const [topic, setTopic] = useState("");
   const [currentTurn, setCurrentTurn] = useState<Turn>("player1");
-  const [timeRemaining, setTimeRemaining] = useState(180);
+  const [timeRemaining, setTimeRemaining] = useState(300);
   const [round, setRound] = useState(1);
   const [myArgument, setMyArgument] = useState("");
   const [transcript, setTranscript] = useState<Array<{speaker: string, text: string, round: number}>>([]);
   const [spectatorCount, setSpectatorCount] = useState(0);
   const [opponent, setOpponent] = useState<string | null>(null);
   const [myRole, setMyRole] = useState<"player1" | "player2" | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
     if (roomCode && stage !== "lobby") {
@@ -56,7 +57,7 @@ export default function RealtimeDebate() {
           
           // Switch turn
           setCurrentTurn(prev => prev === "player1" ? "player2" : "player1");
-          setTimeRemaining(180);
+          setTimeRemaining(300);
         }
       });
 
@@ -66,6 +67,62 @@ export default function RealtimeDebate() {
       };
     }
   }, [roomCode, stage, username]);
+
+  // Timer countdown
+  useEffect(() => {
+    if (stage === "debate" && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [stage, timeRemaining]);
+
+  const startSpeechToText = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join(' ');
+      setMyArgument((prev) => prev + ' ' + transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    if (isRecording) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  };
 
   const createRoom = async () => {
     if (username && topic) {
@@ -148,7 +205,7 @@ export default function RealtimeDebate() {
     
     // Switch turns
     setCurrentTurn(currentTurn === "player1" ? "player2" : "player1");
-    setTimeRemaining(180);
+    setTimeRemaining(300);
     
     // After 3 rounds, end debate
     if (round >= 3 && currentTurn === "player2") {
@@ -279,7 +336,12 @@ export default function RealtimeDebate() {
               />
               
               <div className="input-controls">
-                <button className="btn-secondary">🎤 Speech-to-Text</button>
+                <button 
+                  className="btn-secondary"
+                  onClick={startSpeechToText}
+                >
+                  {isRecording ? '⏹️ Stop Recording' : '🎤 Speech-to-Text'}
+                </button>
                 <button 
                   className="btn-primary"
                   onClick={submitArgument}
