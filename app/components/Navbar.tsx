@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
@@ -45,6 +46,22 @@ export default function Navbar() {
           >
             Contact Us
           </Link>
+          
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="navbar-login-btn">Login</button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10"
+                }
+              }}
+            />
+          </SignedIn>
+          
           <ThemeToggle />
         </div>
       </div>

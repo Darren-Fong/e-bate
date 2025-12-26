@@ -149,11 +149,41 @@ export default function AIDebate() {
 
   return (
     <div className="debate-container">
-      <Link href="/" className="back-link">← Back to Home</Link>
-      
-      <h1 className="page-title">AI Debate Mode</h1>
+      <div className="page-header-with-badge">
+        <h1 className="page-title">AI Debate Mode</h1>
+        {tier === 'free' && (
+          <div className="trial-badge">
+            <span className="badge-label">Free Tier:</span>
+            <span className="badge-count">{trialsRemaining} / {maxTrials} trials remaining</span>
+          </div>
+        )}
+        {tier === 'premium' && (
+          <div className="premium-badge">
+            ✨ Premium - Unlimited Access
+          </div>
+        )}
+      </div>
 
-      {stage === "setup" && (
+      {!canUsePracticeMode && (
+        <div className="access-restricted">
+          <h2>🔒 Free Trials Exhausted</h2>
+          <p>You've used all {maxTrials} free practice mode trials.</p>
+          <p>Upgrade to Premium for unlimited access to AI debates and all features!</p>
+          <Link href="/pricing" className="btn-primary">
+            Upgrade to Premium
+          </Link>
+        </div>
+      )}
+
+      {canUsePracticeMode && stage === "setup" && (
+        <div className="setup-panel">
+          <h2>Setup Your Debate</h2>
+          
+          {tier === 'free' && trialsRemaining <= 2 && trialsRemaining > 0 && (
+            <div className="warning-banner">
+              ⚠️ Only {trialsRemaining} trial{trialsRemaining === 1 ? '' : 's'} remaining. <Link href="/pricing">Upgrade to Premium</Link> for unlimited access.
+            </div>
+          )}
         <div className="setup-panel">
           <h2>Setup Your Debate</h2>
           
