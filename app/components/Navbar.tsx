@@ -44,8 +44,8 @@ export default function Navbar() {
             className={`navbar-link ${pathname === "/contact" ? "active" : ""}`}
           >
             Contact Us
-          <ThemeToggle />
           </Link>
+          <ThemeToggle />
         </div>
       </div>
     </nav>

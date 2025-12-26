@@ -8,18 +8,38 @@ export default function Contact() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the message to your backend
-    setSubmitted(true);
-    setTimeout(() => {
-      setName("");
-      setEmail("");
-      setSubject("");
-      setMessage("");
-      setSubmitted(false);
-    }, 3000);
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/send-contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setName("");
+        setEmail("");
+        setSubject("");
+        setMessage("");
+        setSubmitted(false);
+      }, 3000);
+    } catch (err) {
+      setError("Failed to send message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,6 +65,7 @@ export default function Contact() {
         </div>
 
         <div className="contact-form-wrapper">
+          {error && <div className="error-message">{error}</div>}
           {submitted ? (
             <div className="success-message">
               <h2>Message Sent!</h2>
@@ -101,8 +122,8 @@ export default function Contact() {
                 />
               </div>
 
-              <button type="submit" className="btn-primary">
-                Send Message
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading ? "Sending..." : "Send Message"}
               </button>
             </form>
           )}

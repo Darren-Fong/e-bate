@@ -8,17 +8,37 @@ export default function Feedback() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the feedback to your backend
-    setSubmitted(true);
-    setTimeout(() => {
-      setName("");
-      setEmail("");
-      setMessage("");
-      setSubmitted(false);
-    }, 3000);
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/send-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send feedback");
+      }
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setName("");
+        setEmail("");
+        setMessage("");
+        setSubmitted(false);
+      }, 3000);
+    } catch (err) {
+      setError("Failed to send feedback. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,6 +47,7 @@ export default function Feedback() {
       <p className="page-subtitle">We'd love to hear your thoughts on E-Bate</p>
 
       <div className="feedback-form-container">
+        {error && <div className="error-message">{error}</div>}
         {submitted ? (
           <div className="success-message">
             <h2>Thank you for your feedback!</h2>
@@ -71,8 +92,8 @@ export default function Feedback() {
               />
             </div>
 
-            <button type="submit" className="btn-primary">
-              Submit Feedback
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? "Sending..." : "Submit Feedback"}
             </button>
           </form>
         )}

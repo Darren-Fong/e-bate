@@ -3,10 +3,11 @@ import { teamRooms } from "../../create-room/route";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const roomCode = params.code;
+    const { code } = await params;
+    const roomCode = code;
     const room = teamRooms.get(roomCode);
 
     if (!room) {
