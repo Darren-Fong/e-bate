@@ -266,8 +266,7 @@ export default function AIDebate() {
                   </ul>
                 </div>
                 <div className="feedback-group">
-                 CustomTopic("");
-              set <h4>💡 Areas to Improve</h4>
+                  <h4>💡 Areas to Improve</h4>
                   <ul>
                     {feedback.improvements.map((improvement, idx) => (
                       <li key={idx}>{improvement}</li>
