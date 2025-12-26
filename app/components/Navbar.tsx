@@ -48,7 +48,7 @@ export default function Navbar() {
           </Link>
           
           <SignedOut>
-            <SignInButton mode="modal">
+            <SignInButton mode="redirect">
               <button className="navbar-login-btn">Login</button>
             </SignInButton>
           </SignedOut>
