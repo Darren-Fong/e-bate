@@ -1,1 +1,1 @@
-##### E-Bate - Debate Training Platform
+# E-Bate - Debate Training Platform
