@@ -69,12 +69,21 @@ export async function POST(req: Request) {
       } else {
         const resendApiKey = process.env.RESEND_API_KEY;
         const from = process.env.RESEND_FROM_EMAIL || "E-Bate <onboarding@resend.dev>";
-        const subject = "Welcome to E‑Bate — Start practicing your debate skills";
+        const subject = "Welcome to E‑Bate!";
         const html = `
-          <p>Hi,</p>
-          <p>Welcome to <strong>E‑Bate</strong> — an online debate training platform with AI-powered coaching. You're all set to start practicing debates, get AI rebuttals, and receive constructive feedback.</p>
-          <p>Visit <a href=\"https://your-domain.example\">E‑Bate</a> to begin. If you have any questions or want to contribute, please visit the Contact page.</p>
-          <p>Good luck and happy debating!<br/>— The E‑Bate Team</p>
+        <p>Hi!</p>
+        <p>My name is Darren Fong, the Developer of <strong>E-Bate</strong> — an online debate training platform with AI integration.</p>
+        <p>You're all set to start your debate journey on our platform!</p>
+        <p>On <strong>E‑Bate</strong>, you can:</p>
+        <ul>
+        <li>Practice structured debates with timed rounds and custom topics.</li>
+        <li>Track your progress with AI feedback and scores.</li>
+        <li>Team up and debate in real-time with others.</li>
+        </ul>
+        <p>We believe debating is more than just winning arguments — it’s about sharpening critical thinking, improving communication, and building confidence. Whether you’re a beginner or an experienced speaker, E‑Bate adapts to your journey!</p>
+        <p>If you have any questions or want to contribute, please visit the <a href="https://e-bate.vercel.app/contact">Contact</a> page to get in touch.</p>
+        <p>Good luck and happy debating!</p>
+        <p>Best regards,<br/>Darren Fong<br/>E‑Bate Developer</p>
         `;
 
         try {
