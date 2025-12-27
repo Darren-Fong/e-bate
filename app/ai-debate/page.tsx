@@ -118,11 +118,15 @@ export default function AIDebate() {
     };
 
     recognition.onresult = (event: any) => {
-      const transcriptText = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join(' ');
-      // append to current argument but ensure we don't reuse prior round spilled text
-      setUserArgument((prev) => (prev && prev.trim() ? prev + ' ' + transcriptText : transcriptText));
+      // Use only the latest result chunk to avoid re-joining older results
+      try {
+        const lastResultIndex = event.results.length - 1;
+        const lastResult = event.results[lastResultIndex];
+        const transcriptText = lastResult[0].transcript;
+        setUserArgument((prev) => (prev && prev.trim() ? prev + ' ' + transcriptText : transcriptText));
+      } catch (err) {
+        console.error('Error processing speech recognition result', err);
+      }
     };
 
     recognition.onerror = (event: any) => {
@@ -239,7 +243,7 @@ export default function AIDebate() {
         </div>
       ) : !user ? (
         <div className="auth-required">
-          <h2>🔒 Sign In Required</h2>
+          <h2>Sign In Required</h2>
           <p>Please sign in to access AI practice mode.</p>
           <Link href="/sign-in" className="btn-primary">
             Sign In
@@ -338,12 +342,19 @@ export default function AIDebate() {
             />
             
             <div className="input-controls">
-              <button 
+                <button 
                 className="btn-secondary"
-                onClick={startSpeechToText}
+                onClick={() => {
+                  if (isRecording) {
+                    // stop
+                    try { recognitionRef.current?.stop(); } catch (e) { /* noop */ }
+                  } else {
+                    startSpeechToText();
+                  }
+                }}
                 disabled={isLoading}
               >
-                {isRecording ? '⏹️ Stop Recording' : '🎤 Speech-to-Text'}
+                {isRecording ? 'Stop Recording' : 'Start Speech-to-Text'}
               </button>
               <button 
                 className="btn-primary"
@@ -392,7 +403,7 @@ export default function AIDebate() {
 
       {stage === "finished" && (
         <div className="debate-finished">
-          <h2>Debate Complete! 🎉</h2>
+          <h2>Debate Complete!</h2>
           
           <div className="transcript-section">
             <h3>Full Transcript</h3>
@@ -423,7 +434,7 @@ export default function AIDebate() {
                   </ul>
                 </div>
                 <div className="feedback-group">
-                  <h4>💡 Areas to Improve</h4>
+                  <h4>Areas to Improve</h4>
                   <ul>
                     {feedback.improvements.map((improvement, idx) => (
                       <li key={idx}>{improvement}</li>

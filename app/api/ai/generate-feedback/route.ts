@@ -53,11 +53,25 @@ Return only valid JSON, no additional text.`;
     });
 
     const text = completion.choices[0].message.content || "";
-    
+
     // Try to parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      const feedback = JSON.parse(jsonMatch[0]);
+      const raw = JSON.parse(jsonMatch[0]);
+      // Normalize score to a number between 0 and 100
+      let score = raw.score;
+      if (typeof score === 'string') {
+        const m = score.match(/(\d{1,3})/);
+        score = m ? Number(m[1]) : NaN;
+      }
+      if (typeof score !== 'number' || isNaN(score)) score = 0;
+      if (score < 0) score = 0;
+      if (score > 100) score = 100;
+      const feedback = {
+        strengths: Array.isArray(raw.strengths) ? raw.strengths : [],
+        improvements: Array.isArray(raw.improvements) ? raw.improvements : [],
+        score,
+      };
       return NextResponse.json(feedback);
     }
     
