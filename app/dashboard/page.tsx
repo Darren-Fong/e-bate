@@ -4,7 +4,7 @@ import { useUser, SignIn } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getTrialsRemaining, getTierInfo, getTrialsLimit } from "@/lib/access-control";
-import { getDebateHistory, clearDebateHistory } from '@/lib/debate-history';
+import { getDebateHistory, clearDebateHistory, DebateRecord } from '@/lib/debate-history';
 
 interface DebateStats {
   totalDebates: number;
@@ -28,8 +28,8 @@ export default function DashboardPage() {
   const [trialsRemaining, setTrialsRemaining] = useState<number | null>(null);
   const [trialsLimit, setTrialsLimit] = useState<number>(5);
   const [tierName, setTierName] = useState<string>('Free');
-  const [debateHistory, setDebateHistory] = useState<any[]>([]);
-  const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
+  const [debateHistory, setDebateHistory] = useState<DebateRecord[]>([]);
+  const [selectedRecord, setSelectedRecord] = useState<DebateRecord | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -53,9 +53,15 @@ export default function DashboardPage() {
       // Load debate history
       try {
         const history = getDebateHistory(userId);
-        setDebateHistory(history);
+        // defensive: ensure array and normalize shape
+        if (Array.isArray(history)) {
+          setDebateHistory(history as DebateRecord[]);
+        } else {
+          setDebateHistory([]);
+        }
       } catch (err) {
         console.error('Error loading debate history:', err);
+        setDebateHistory([]);
       }
     }
   }, [user]);

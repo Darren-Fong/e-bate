@@ -160,10 +160,19 @@
 
 /* History section */
 .history-section { margin-top: 28px; }
-.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-list { display: flex; flex-direction: column; gap: 10px; max-height: 36vh; overflow: auto; padding-right: 6px; }
 .history-item { display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; }
 .history-item .text-muted { color:var(--text-muted); font-size:13px; }
 .history-actions button { margin-left: 12px; }
+
+/* Modal transcript scrolling */
+.modal-card { max-width: 760px; width: 94%; max-height: 80vh; overflow: hidden; }
+.transcript-section { max-height: 58vh; overflow: auto; padding-right: 8px; }
+.transcript-entry { margin-bottom: 10px; }
+.transcript-entry.user { background: rgba(0,0,0,0.03); padding:8px; border-radius:8px; }
+.transcript-entry.ai { background: rgba(0,0,0,0.02); padding:8px; border-radius:8px; }
+.feedback-group ul { margin:6px 0 12px 20px; }
+.score-display .score-circle { width: 64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--muted-bg); }
 @font-face {
   font-family: "SF Pro Text";
   font-style: normal;
