@@ -10,7 +10,8 @@ import { useState, useEffect } from "react";
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  // Start in mobile mode to avoid showing full links briefly
+  const [isMobile, setIsMobile] = useState<boolean>(() => true);
 
   useEffect(() => {
     // Prevent body scroll when mobile nav is open
