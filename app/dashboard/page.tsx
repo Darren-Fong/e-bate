@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getTrialsRemaining, isAdmin } from "@/lib/access-control";
+import { getTrialsRemaining, getTierInfo, getTrialsLimit } from "@/lib/access-control";
 
 interface DebateStats {
   totalDebates: number;
@@ -25,6 +25,8 @@ export default function DashboardPage() {
     lastDebateDate: null,
   });
   const [trialsRemaining, setTrialsRemaining] = useState<number | null>(null);
+  const [trialsLimit, setTrialsLimit] = useState<number>(5);
+  const [tierName, setTierName] = useState<string>('Free');
 
   useEffect(() => {
     if (user) {
@@ -36,12 +38,15 @@ export default function DashboardPage() {
         setStats(JSON.parse(savedStats));
       }
 
-      // Load trial count
+      // Load trial count and tier info
       const userEmail = user.primaryEmailAddress?.emailAddress;
-      if (!isAdmin(userEmail)) {
-        const remaining = getTrialsRemaining(userId, userEmail);
-        setTrialsRemaining(remaining);
-      }
+      const tier = getTierInfo(userEmail);
+      const remaining = getTrialsRemaining(userId, userEmail);
+      const limit = getTrialsLimit(userEmail);
+      
+      setTierName(tier.displayName);
+      setTrialsLimit(limit);
+      setTrialsRemaining(remaining);
     }
   }, [user]);
 
@@ -90,7 +95,11 @@ export default function DashboardPage() {
               <p className="dashboard-subtitle">Here's your debate journey</p>
               {trialsRemaining !== null && (
                 <p className="dashboard-trials">
-                  🎯 AI Practice rounds remaining: <strong>{trialsRemaining}</strong> / 5
+                  {trialsLimit === Infinity ? (
+                    <>✨ <strong>{tierName}</strong> Access - Unlimited AI Practice</>
+                  ) : (
+                    <>🎯 <strong>{tierName}</strong> tier: <strong>{trialsRemaining}</strong> / {trialsLimit} AI Practice rounds</>
+                  )}
                 </p>
               )}
             </div>

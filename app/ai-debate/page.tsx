@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { trackDebate } from "@/lib/debate-tracker";
-import { canAccessPracticeMode, getTrialsRemaining, incrementTrialCount, isAdmin } from "@/lib/access-control";
+import { canAccessPracticeMode, getTrialsRemaining, incrementTrialCount, isUnlimited, getTierInfo, getTrialsLimit } from "@/lib/access-control";
 
 type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 
@@ -22,16 +22,29 @@ export default function AIDebate() {
   const [feedback, setFeedback] = useState<{strengths: string[], improvements: string[], score: number} | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [trialsRemaining, setTrialsRemaining] = useState<number>(0);
+  const [trialsLimit, setTrialsLimit] = useState<number>(5);
+  const [tierName, setTierName] = useState<string>('Free');
   const [hasAccess, setHasAccess] = useState(true);
 
   // Check access on mount and when user changes
   useEffect(() => {
     if (user?.id) {
       const userEmail = user.primaryEmailAddress?.emailAddress;
+      const tier = getTierInfo(userEmail);
       const remaining = getTrialsRemaining(user.id, userEmail);
+      const limit = getTrialsLimit(userEmail);
       const access = canAccessPracticeMode(user.id, userEmail);
+      
+      setTierName(tier.displayName);
       setTrialsRemaining(remaining);
+      setTrialsLimit(limit);
       setHasAccess(access);
+      
+      // Debug logging
+      console.log(`[AI Debate] User: ${userEmail}`);
+      console.log(`[AI Debate] Tier: ${tier.displayName} (${limit === Infinity ? 'Unlimited' : `${limit} debates`})`);
+      console.log(`[AI Debate] Trials remaining: ${remaining === Infinity ? '∞' : `${remaining}/${limit}`}`);
+      console.log(`[AI Debate] Has access: ${access}`);
     }
   }, [user]);
 
@@ -40,11 +53,19 @@ export default function AIDebate() {
       // Increment trial count for non-admin users
       if (user?.id) {
         const userEmail = user.primaryEmailAddress?.emailAddress;
+        
+        console.log(`[AI Debate] Starting debate for user ${userEmail}`);
+        console.log(`[AI Debate] Before increment - trials used: ${localStorage.getItem(`trials_used_${user.id}`)}`);
+        
         incrementTrialCount(user.id, userEmail);
+        
+        console.log(`[AI Debate] After increment - trials used: ${localStorage.getItem(`trials_used_${user.id}`)}`);
         
         // Update remaining trials display
         const remaining = getTrialsRemaining(user.id, userEmail);
         setTrialsRemaining(remaining);
+        
+        console.log(`[AI Debate] Trials remaining after increment: ${remaining}/5`);
         
         // Track debate participation
         trackDebate(user.id, 'ai');
@@ -192,10 +213,18 @@ export default function AIDebate() {
           <div className="spinner-dot"></div>
           <div className="spinner-dot"></div>
         </div>
+      ) : !user ? (
+        <div className="auth-required">
+          <h2>🔒 Sign In Required</h2>
+          <p>Please sign in to access AI practice mode.</p>
+          <Link href="/sign-in" className="btn-primary">
+            Sign In
+          </Link>
+        </div>
       ) : !hasAccess ? (
         <div className="auth-required">
           <h2>🔒 Trial Limit Reached</h2>
-          <p>You've used all {5} free practice rounds.</p>
+          <p>You've used all {trialsLimit} {tierName} tier practice rounds.</p>
           <p>Thank you for trying E-Bate! This is currently a free demo version.</p>
           <Link href="/" className="btn-primary">
             Back to Home
@@ -207,9 +236,15 @@ export default function AIDebate() {
             <div className="setup-panel">
               <h2>Setup Your Debate</h2>
               
-              {!isAdmin(user?.primaryEmailAddress?.emailAddress) && trialsRemaining < Infinity && (
+              {trialsLimit !== Infinity && (
                 <div className="trial-notice">
-                  <p>🎯 Practice rounds remaining: <strong>{trialsRemaining}</strong></p>
+                  <p>🎯 {tierName} tier: <strong>{trialsRemaining} / {trialsLimit}</strong> practice rounds remaining</p>
+                </div>
+              )}
+              
+              {trialsLimit === Infinity && (
+                <div className="trial-notice" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+                  <p>✨ {tierName} Access: <strong>Unlimited</strong> practice rounds</p>
                 </div>
               )}
               
