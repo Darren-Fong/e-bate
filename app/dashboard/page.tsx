@@ -4,6 +4,9 @@ import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getTrialsRemaining, getTierInfo, getTrialsLimit } from "@/lib/access-control";
+import dynamic from 'next/dynamic';
+
+const SignIn = dynamic(() => import('@clerk/nextjs').then(mod => mod.SignIn), { ssr: false });
 
 interface DebateStats {
   totalDebates: number;
@@ -62,15 +65,35 @@ export default function DashboardPage() {
     );
   }
 
+  const [showSignIn, setShowSignIn] = useState(false);
+
   if (!user) {
     return (
       <div className="container">
         <div className="auth-required">
-          <h2>🔒 Authentication Required</h2>
+          <h2>Authentication Required</h2>
           <p>Please sign in to view your dashboard</p>
-          <Link href="/sign-in" className="btn-primary">
+          <button
+            className="btn-primary"
+            onClick={() => setShowSignIn(true)}
+          >
             Sign In
-          </Link>
+          </button>
+
+          {showSignIn && (
+            <div className="modal-overlay" role="dialog" aria-modal="true">
+              <div className="modal-backdrop" onClick={() => setShowSignIn(false)} />
+              <div className="modal-card">
+                <button className="modal-close" onClick={() => setShowSignIn(false)} aria-label="Close">✕</button>
+                <h3 className="modal-title">Sign in to E‑Bate</h3>
+                {/* Clerk SignIn component */}
+                {/* Importing locally here to avoid SSR issues */}
+                <div className="modal-signin">
+                  <SignIn routing="path" path="/sign-in" afterSignInUrl="/dashboard" />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -123,10 +146,11 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                <rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.4" />
+                <circle cx="8.5" cy="10" r="1.2" fill="currentColor" />
+                <circle cx="15.5" cy="10" r="1.2" fill="currentColor" />
+                <rect x="8" y="13.5" width="8" height="1.6" rx="0.8" fill="currentColor" />
               </svg>
             </div>
             <div className="stat-content">
@@ -137,10 +161,10 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                <path d="M3 21l8-8M21 3l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 7l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M14 14l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
             <div className="stat-content">
@@ -151,10 +175,11 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                <circle cx="9" cy="9" r="2.2" fill="currentColor" />
+                <path d="M4 18c1.5-2 4-3 5-3s3.5 1 5 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="17" cy="8" r="1.8" fill="currentColor" />
+                <path d="M13.5 18c1-1.6 3-2.4 4-2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
             <div className="stat-content">
@@ -165,10 +190,10 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.4" />
+                <path d="M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                <rect x="7" y="9" width="10" height="6" rx="1" fill="currentColor" opacity="0.06" />
               </svg>
             </div>
             <div className="stat-content">
@@ -199,22 +224,21 @@ export default function DashboardPage() {
           <div className="action-grid">
             <Link href="/ai-debate" className="action-card-dash">
               <div className="action-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
-                </svg>
-              </div>
+                  <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                    <rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.2" />
+                    <circle cx="8.5" cy="9" r="1" fill="currentColor" />
+                    <circle cx="15.5" cy="9" r="1" fill="currentColor" />
+                  </svg>
+                </div>
               <h3>AI Practice</h3>
               <p>Sharpen your skills with AI</p>
             </Link>
 
             <Link href="/realtime-debate" className="action-card-dash">
               <div className="action-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+                <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                  <path d="M3 21l8-8M21 3l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M7 7l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <h3>1v1 Debate</h3>
@@ -223,10 +247,9 @@ export default function DashboardPage() {
 
             <Link href="/team-debate" className="action-card-dash">
               <div className="action-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
-                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
-                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+                <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+                  <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M4 12h16M12 4v16" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
                 </svg>
               </div>
               <h3>Team Debate</h3>

@@ -20,10 +20,10 @@ export const metadata: Metadata = {
   description: "Practice your debate skills with AI or compete in real-time debates with others",
   icons: {
     icon: [
-      { url: '/e-bate-favicon.png' },
-      { url: '/favicon.ico', sizes: 'any' }
+      { url: '/public/e-bate-favicon.png' },
+      { url: '/public/e-bate-favicon.png', sizes: 'any' }
     ],
-    apple: '/e-bate-favicon.png',
+    apple: '/public/e-bate-favicon.png',
   },
 };
 
@@ -35,10 +35,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
+        <head> 
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <link rel="icon" href="/favicon.ico" />
+          <link rel="icon" href="/public/e-bate-favicon.png" />
+          <link rel="apple-touch-icon" href="/public/e-bate-favicon.png" />
+          <meta name="theme-color" content="#ffffff" />
           <title>E-Bate - AI Debate Platform</title>
         </head>
         <body
