@@ -1,10 +1,7 @@
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignIn } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getTrialsRemaining, getTierInfo, getTrialsLimit } from "@/lib/access-control";
-import dynamic from 'next/dynamic';
-
-const SignIn = dynamic(() => import('@clerk/nextjs').then(mod => mod.SignIn), { ssr: false });
 import { getDebateHistory, clearDebateHistory } from '@/lib/debate-history';
 
 interface DebateStats {
