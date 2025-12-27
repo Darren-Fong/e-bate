@@ -45,21 +45,17 @@ export default function Contact() {
   return (
     <div className="container">
       <h1 className="page-title">Contact Us</h1>
-      <p className="page-subtitle">Get in touch with the E-Bate team</p>
+      <p className="page-subtitle">Get in touch with me</p>
 
       <div className="contact-container">
         <div className="contact-info">
           <h2>Get in Touch</h2>
-          <p>Have questions, suggestions, or need support? We're here to help!</p>
+          <p>Have questions, suggestions, or need support?</p>
           
           <div className="contact-details">
             <div className="contact-item">
               <h3>Email</h3>
-              <p>mail@darrenfong.net</p>
-            </div>
-            <div className="contact-item">
-              <h3>Response Time</h3>
-              <p>We typically respond within 24 hours</p>
+              <p>e-bate@darrenfong.net</p>
             </div>
           </div>
         </div>

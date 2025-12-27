@@ -91,14 +91,14 @@ export default function DashboardPage() {
               )}
             </div>
             <div>
-              <h1>Welcome back, {user.firstName || user.username}! 👋</h1>
+              <h1>Welcome back, {user.firstName || user.username}!</h1>
               <p className="dashboard-subtitle">Here's your debate journey</p>
               {trialsRemaining !== null && (
                 <p className="dashboard-trials">
                   {trialsLimit === Infinity ? (
-                    <>✨ <strong>{tierName}</strong> Access - Admin AI Practice</>
+                    <><strong>{tierName}</strong> Access - Unlimited AI Practice</>
                   ) : (
-                    <>🎯 <strong>{tierName}</strong> tier: <strong>{trialsRemaining}</strong> / {trialsLimit} AI Practice rounds</>
+                    <><strong>{tierName}</strong> tier: <strong>{trialsRemaining}</strong> / {trialsLimit} AI Practice rounds</>
                   )}
                 </p>
               )}
@@ -108,7 +108,13 @@ export default function DashboardPage() {
 
         <div className="stats-grid">
           <div className="stat-card highlight">
-            <div className="stat-icon">🎯</div>
+            <div className="stat-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <div className="stat-content">
               <div className="stat-number">{stats.totalDebates}</div>
               <div className="stat-label">Total Debates</div>
@@ -116,7 +122,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">🤖</div>
+            <div className="stat-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <div className="stat-content">
               <div className="stat-number">{stats.aiDebates}</div>
               <div className="stat-label">AI Practice</div>
@@ -124,7 +136,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">⚔️</div>
+            <div className="stat-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <div className="stat-content">
               <div className="stat-number">{stats.realtimeDebates}</div>
               <div className="stat-label">1v1 Debates</div>
@@ -132,7 +150,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <div className="stat-content">
               <div className="stat-number">{stats.teamDebates}</div>
               <div className="stat-label">Team Debates</div>
@@ -140,7 +164,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">🌍</div>
+            <div className="stat-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <div className="stat-content">
               <div className="stat-number">{stats.munDebates}</div>
               <div className="stat-label">MUN Simulations</div>
@@ -148,7 +178,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">📅</div>
+            <div className="stat-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <div className="stat-content">
               <div className="stat-number">
                 {stats.lastDebateDate ? new Date(stats.lastDebateDate).toLocaleDateString() : "Never"}
@@ -162,25 +198,49 @@ export default function DashboardPage() {
           <h2>Quick Actions</h2>
           <div className="action-grid">
             <Link href="/ai-debate" className="action-card-dash">
-              <div className="action-icon">🤖</div>
+              <div className="action-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+                </svg>
+              </div>
               <h3>AI Practice</h3>
               <p>Sharpen your skills with AI</p>
             </Link>
 
             <Link href="/realtime-debate" className="action-card-dash">
-              <div className="action-icon">⚔️</div>
+              <div className="action-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+                </svg>
+              </div>
               <h3>1v1 Debate</h3>
               <p>Challenge a real opponent</p>
             </Link>
 
             <Link href="/team-debate" className="action-card-dash">
-              <div className="action-icon">👥</div>
+              <div className="action-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+                </svg>
+              </div>
               <h3>Team Debate</h3>
               <p>3v3 collaborative debate</p>
             </Link>
 
             <Link href="/mun-debate" className="action-card-dash">
-              <div className="action-icon">🌍</div>
+              <div className="action-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                  <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                  <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+                </svg>
+              </div>
               <h3>MUN Simulation</h3>
               <p>Model United Nations</p>
             </Link>
@@ -189,7 +249,13 @@ export default function DashboardPage() {
 
         {stats.totalDebates === 0 && (
           <div className="empty-state">
-            <div className="empty-icon">🎯</div>
+            <div className="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
+              </svg>
+            </div>
             <h2>Start Your Debate Journey!</h2>
             <p>You haven't participated in any debates yet. Choose a mode above to get started!</p>
           </div>
