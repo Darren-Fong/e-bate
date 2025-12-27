@@ -173,6 +173,11 @@
 .transcript-entry.ai { background: rgba(0,0,0,0.02); padding:8px; border-radius:8px; }
 .feedback-group ul { margin:6px 0 12px 20px; }
 .score-display .score-circle { width: 64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--muted-bg); }
+
+/* Collapsible history support */
+.history-section.collapsed .history-list { max-height: 0; overflow: hidden; transition: max-height 220ms ease; }
+.history-toggle { background: transparent; border: 1px solid var(--card-border); padding:6px 10px; border-radius:8px; font-size:13px; cursor:pointer; }
+.history-toggle[aria-expanded="true"] { background: var(--muted-bg); }
 @font-face {
   font-family: "SF Pro Text";
   font-style: normal;
@@ -281,6 +286,40 @@ h3 {
 
 p {
   margin: 0;
+}
+
+/* Mobile-first variables */
+:root {
+  --mobile-gap: 12px;
+  --mobile-pad: 16px;
+  --touch-size: 44px;
+}
+
+/* Mobile first base adjustments */
+@media (max-width: 768px) {
+  body { -webkit-font-smoothing:antialiased; }
+  .container { padding: 0 14px; }
+  .home-logo { display:flex; justify-content:center; margin-top:10px; }
+  .hero-title { font-size: 20px; line-height:1.2; }
+  .hero-description { font-size: 14px; }
+  .home-actions.revamped { display: flex; flex-direction: column; gap: var(--mobile-gap); }
+  .action-card.large { width: 100%; padding: 14px; border-radius:12px; }
+  .action-card .cta { display:inline-block; margin-top:10px; }
+
+  /* Stats become stacked list on mobile */
+  .stats-grid { display: flex; flex-direction: column; gap: 10px; }
+  .stat-card { width: 100%; padding: 12px; border-radius: 10px; }
+
+  /* Dashboard actions and lists */
+  .dashboard-container { padding: 12px 0; }
+  .dashboard-header { gap: 12px; }
+  .dashboard-user-info { flex-direction: row; gap: 12px; align-items:center; }
+
+  /* Make modals full-screen on narrow devices */
+  .modal-overlay .modal-card { width: 100%; max-width: 100%; height: 100%; max-height: 100%; border-radius: 0; margin: 0; display: flex; flex-direction: column; }
+  .modal-overlay .modal-backdrop { position: fixed; inset: 0; }
+  .modal-card .modal-signin { flex: 1 1 auto; overflow: auto; }
+  .mobile-nav-panel { width: 84%; }
 }
 
 /* Navbar */

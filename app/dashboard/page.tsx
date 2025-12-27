@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const [tierName, setTierName] = useState<string>('Free');
   const [debateHistory, setDebateHistory] = useState<DebateRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<DebateRecord | null>(null);
+  const [showHistory, setShowHistory] = useState<boolean>(true);
 
   useEffect(() => {
     if (user) {
@@ -283,8 +284,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="history-section">
-          <h2>Debate History</h2>
+        <div className={`history-section ${showHistory ? '' : 'collapsed'}`}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+            <h2>Debate History</h2>
+            <button className="history-toggle" onClick={() => setShowHistory(s => !s)} aria-expanded={showHistory}>{showHistory ? 'Hide' : 'Show'}</button>
+          </div>
           {debateHistory.length === 0 ? (
             <p className="text-muted">No past debates recorded yet.</p>
           ) : (
@@ -308,6 +312,7 @@ export default function DashboardPage() {
                 if (!user) return;
                 clearDebateHistory(user.id as string);
                 setDebateHistory([]);
+                setSelectedRecord(null);
               }}>Clear History</button>
             </div>
           )}
