@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { trackDebate } from "@/lib/debate-tracker";
-import { canAccessPracticeMode, getTrialsRemaining, incrementTrialCount, isUnlimited, getTierInfo, getTrialsLimit } from "@/lib/access-control";
+import { canAccessPracticeMode, getTrialsRemaining, incrementTrialCount, getTierInfo, getTrialsLimit } from "@/lib/access-control";
 
 type DebateStage = "setup" | "user-turn" | "ai-turn" | "finished";
 
@@ -29,11 +29,11 @@ export default function AIDebate() {
   // Check access on mount and when user changes
   useEffect(() => {
     if (user?.id) {
-      const userEmail = user.primaryEmailAddress?.emailAddress;
-      const tier = getTierInfo(userEmail);
-      const remaining = getTrialsRemaining(user.id, userEmail);
-      const limit = getTrialsLimit(userEmail);
-      const access = canAccessPracticeMode(user.id, userEmail);
+      const metadata = user.publicMetadata;
+      const tier = getTierInfo(metadata);
+      const remaining = getTrialsRemaining(user.id, metadata);
+      const limit = getTrialsLimit(metadata);
+      const access = canAccessPracticeMode(user.id, metadata);
       
       setTierName(tier.displayName);
       setTrialsRemaining(remaining);
@@ -41,7 +41,7 @@ export default function AIDebate() {
       setHasAccess(access);
       
       // Debug logging
-      console.log(`[AI Debate] User: ${userEmail}`);
+      console.log(`[AI Debate] User: ${user.primaryEmailAddress?.emailAddress}`);
       console.log(`[AI Debate] Tier: ${tier.displayName} (${limit === Infinity ? 'Unlimited' : `${limit} debates`})`);
       console.log(`[AI Debate] Trials remaining: ${remaining === Infinity ? '∞' : `${remaining}/${limit}`}`);
       console.log(`[AI Debate] Has access: ${access}`);
@@ -50,22 +50,22 @@ export default function AIDebate() {
 
   const startDebate = () => {
     if (topic.trim()) {
-      // Increment trial count for non-admin users
+      // Increment trial count for non-unlimited users
       if (user?.id) {
-        const userEmail = user.primaryEmailAddress?.emailAddress;
+        const metadata = user.publicMetadata;
         
-        console.log(`[AI Debate] Starting debate for user ${userEmail}`);
+        console.log(`[AI Debate] Starting debate for user ${user.primaryEmailAddress?.emailAddress}`);
         console.log(`[AI Debate] Before increment - trials used: ${localStorage.getItem(`trials_used_${user.id}`)}`);
         
-        incrementTrialCount(user.id, userEmail);
+        incrementTrialCount(user.id, metadata);
         
         console.log(`[AI Debate] After increment - trials used: ${localStorage.getItem(`trials_used_${user.id}`)}`);
         
         // Update remaining trials display
-        const remaining = getTrialsRemaining(user.id, userEmail);
+        const remaining = getTrialsRemaining(user.id, metadata);
         setTrialsRemaining(remaining);
         
-        console.log(`[AI Debate] Trials remaining after increment: ${remaining}/5`);
+        console.log(`[AI Debate] Trials remaining after increment: ${remaining}`);
         
         // Track debate participation
         trackDebate(user.id, 'ai');

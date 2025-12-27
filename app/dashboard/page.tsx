@@ -38,11 +38,11 @@ export default function DashboardPage() {
         setStats(JSON.parse(savedStats));
       }
 
-      // Load trial count and tier info
-      const userEmail = user.primaryEmailAddress?.emailAddress;
-      const tier = getTierInfo(userEmail);
-      const remaining = getTrialsRemaining(userId, userEmail);
-      const limit = getTrialsLimit(userEmail);
+      // Load trial count and tier info from Clerk metadata
+      const metadata = user.publicMetadata;
+      const tier = getTierInfo(metadata);
+      const remaining = getTrialsRemaining(userId, metadata);
+      const limit = getTrialsLimit(metadata);
       
       setTierName(tier.displayName);
       setTrialsLimit(limit);

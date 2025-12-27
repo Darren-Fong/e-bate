@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { getTrialsUsed, getTrialsRemaining, isUnlimited, resetTrials, getTierInfo, getTrialsLimit, getUserTier, TIERS } from "@/lib/access-control";
+import { getTrialsUsed, getTrialsRemaining, resetTrials, getTierInfo, getTrialsLimit, getUserTier, TIERS } from "@/lib/access-control";
 
 export default function DebugTrials() {
   const { user, isLoaded } = useUser();
@@ -17,13 +17,13 @@ export default function DebugTrials() {
 
   const loadData = () => {
     if (user?.id) {
-      const userEmail = user.primaryEmailAddress?.emailAddress;
-      const tier = getTierInfo(userEmail);
-      const type = getUserTier(userEmail);
+      const metadata = user.publicMetadata;
+      const tier = getTierInfo(metadata);
+      const type = getUserTier(metadata);
       const used = getTrialsUsed(user.id);
-      const remaining = getTrialsRemaining(user.id, userEmail);
-      const limit = getTrialsLimit(userEmail);
-      const unlimited = isUnlimited(userEmail);
+      const remaining = getTrialsRemaining(user.id, metadata);
+      const limit = getTrialsLimit(metadata);
+      const unlimited = tier.limit === Infinity;
       
       setTierName(tier.displayName);
       setTierType(type);

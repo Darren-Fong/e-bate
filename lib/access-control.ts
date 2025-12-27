@@ -1,5 +1,6 @@
-// Access control with tier system
-// Add email addresses to assign tiers to specific accounts
+// Access control with tier system using Clerk metadata
+// Tiers are stored in user.publicMetadata.tier in Clerk
+// Auto-assigned via webhook on signup, editable via Clerk Dashboard
 
 export type TierType = 'free' | 'basic' | 'pro' | 'unlimited';
 
@@ -33,36 +34,27 @@ export const TIERS: Record<TierType, Tier> = {
   }
 };
 
-// Assign tiers to specific email addresses
-// Add emails here to give them specific tiers
-// IMPORTANT: Add your actual email addresses here (not committed to git)
-const USER_TIERS: Record<string, TierType> = {
-  // Example: 'your-email@example.com': 'unlimited',
-  // Example: 'user@example.com': 'basic',
-  // Example: 'premium@example.com': 'pro',
-};
-
-// Default tier for users not in the list above
+// Default tier for users without metadata set
 const DEFAULT_TIER: TierType = 'free';
 
-export function getUserTier(userEmail: string | undefined): TierType {
-  if (!userEmail) return DEFAULT_TIER;
-  const email = userEmail.toLowerCase();
-  return USER_TIERS[email] || DEFAULT_TIER;
+export function getUserTier(userMetadata: any): TierType {
+  // Read tier from Clerk private metadata
+  const tier = userMetadata?.tier as TierType;
+  return tier && tier in TIERS ? tier : DEFAULT_TIER;
 }
 
-export function getTierInfo(userEmail: string | undefined): Tier {
-  const tierType = getUserTier(userEmail);
+export function getTierInfo(userMetadata: any): Tier {
+  const tierType = getUserTier(userMetadata);
   return TIERS[tierType];
 }
 
-export function isUnlimited(userEmail: string | undefined): boolean {
-  return getUserTier(userEmail) === 'unlimited';
+export function isUnlimited(userMetadata: any): boolean {
+  return getUserTier(userMetadata) === 'unlimited';
 }
 
 // Legacy function for backward compatibility
-export function isAdmin(userEmail: string | undefined): boolean {
-  return isUnlimited(userEmail);
+export function isAdmin(userMetadata: any): boolean {
+  return isUnlimited(userMetadata);
 }
 
 export function getTrialsUsed(userId: string): number {
@@ -71,26 +63,26 @@ export function getTrialsUsed(userId: string): number {
   return trialsUsed ? parseInt(trialsUsed, 10) : 0;
 }
 
-export function getTrialsRemaining(userId: string, userEmail: string | undefined): number {
-  const tier = getTierInfo(userEmail);
+export function getTrialsRemaining(userId: string, userMetadata: any): number {
+  const tier = getTierInfo(userMetadata);
   if (tier.limit === Infinity) return Infinity;
   return Math.max(0, tier.limit - getTrialsUsed(userId));
 }
 
-export function getTrialsLimit(userEmail: string | undefined): number {
-  const tier = getTierInfo(userEmail);
+export function getTrialsLimit(userMetadata: any): number {
+  const tier = getTierInfo(userMetadata);
   return tier.limit;
 }
 
-export function canAccessPracticeMode(userId: string, userEmail: string | undefined): boolean {
-  return getTrialsRemaining(userId, userEmail) > 0;
+export function canAccessPracticeMode(userId: string, userMetadata: any): boolean {
+  return getTrialsRemaining(userId, userMetadata) > 0;
 }
 
-export function incrementTrialCount(userId: string, userEmail: string | undefined): void {
-  const tier = getTierInfo(userEmail);
+export function incrementTrialCount(userId: string, userMetadata: any): void {
+  const tier = getTierInfo(userMetadata);
   
   if (tier.limit === Infinity) {
-    console.log(`[Access Control] ${tier.displayName} user ${userEmail} - not consuming trials`);
+    console.log(`[Access Control] ${tier.displayName} user - not consuming trials`);
     return;
   }
   
@@ -99,7 +91,7 @@ export function incrementTrialCount(userId: string, userEmail: string | undefine
   const currentTrials = getTrialsUsed(userId);
   const newCount = currentTrials + 1;
   localStorage.setItem(`trials_used_${userId}`, newCount.toString());
-  console.log(`[Access Control] ${tier.displayName} user ${userEmail} - trials: ${currentTrials} → ${newCount} (limit: ${tier.limit})`);
+  console.log(`[Access Control] ${tier.displayName} user - trials: ${currentTrials} → ${newCount} (limit: ${tier.limit})`);
 }
 
 export function resetTrials(userId: string): void {
