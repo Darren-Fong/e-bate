@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { trackDebate } from "@/lib/debate-tracker";
@@ -21,6 +21,7 @@ export default function AIDebate() {
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{strengths: string[], improvements: string[], score: number} | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const [trialsRemaining, setTrialsRemaining] = useState<number>(0);
   const [trialsLimit, setTrialsLimit] = useState<number>(5);
   const [tierName, setTierName] = useState<string>('Free');
@@ -99,10 +100,15 @@ export default function AIDebate() {
       alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
       return;
     }
+    // Stop existing recognition if any
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (e) { /* noop */ }
+      recognitionRef.current = null;
+    }
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    
+
     recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = 'en-US';
@@ -112,26 +118,28 @@ export default function AIDebate() {
     };
 
     recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
+      const transcriptText = Array.from(event.results)
         .map((result: any) => result[0].transcript)
         .join(' ');
-      setUserArgument((prev) => prev + ' ' + transcript);
+      // append to current argument but ensure we don't reuse prior round spilled text
+      setUserArgument((prev) => (prev && prev.trim() ? prev + ' ' + transcriptText : transcriptText));
     };
 
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsRecording(false);
+      recognitionRef.current = null;
     };
 
     recognition.onend = () => {
       setIsRecording(false);
+      recognitionRef.current = null;
     };
 
-    if (isRecording) {
-      recognition.stop();
-    } else {
-      recognition.start();
-    }
+    // clear previous argument for a fresh round (user expects fresh transcript)
+    setUserArgument('');
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   const submitArgument = async () => {
@@ -190,9 +198,25 @@ export default function AIDebate() {
         });
         
         if (feedbackResponse.ok) {
-          const feedbackData = await feedbackResponse.json();
-          setFeedback(feedbackData);
-        }
+            const feedbackData = await feedbackResponse.json();
+            setFeedback(feedbackData);
+            // Save debate history (with transcript + feedback)
+            try {
+              if (user?.id) {
+                const { saveDebate } = await import('@/lib/debate-history');
+                saveDebate(user.id, {
+                  topic,
+                  date: new Date().toISOString(),
+                  type: 'ai',
+                  rounds: round,
+                  transcript,
+                  feedback: feedbackData || null,
+                });
+              }
+            } catch (err) {
+              console.error('Error saving debate history:', err);
+            }
+          }
       } catch (error) {
         console.error("Error generating feedback:", error);
       }
@@ -238,13 +262,13 @@ export default function AIDebate() {
               
               {trialsLimit !== Infinity && (
                 <div className="trial-notice">
-                  <p>🎯 {tierName} tier: <strong>{trialsRemaining} / {trialsLimit}</strong> practice rounds remaining</p>
+                  <p>{tierName} tier: <strong>{trialsRemaining} / {trialsLimit}</strong> practice rounds remaining</p>
                 </div>
               )}
               
               {trialsLimit === Infinity && (
                 <div className="trial-notice" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-                  <p>✨ {tierName} Access: <strong>Admin</strong> practice rounds</p>
+                  <p>{tierName} Access: <strong>Unlimited</strong> practice rounds</p>
                 </div>
               )}
               

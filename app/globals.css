@@ -157,6 +157,13 @@
 }
 .auth-required h2 { font-size: 20px; margin: 0; }
 .auth-required p { color: var(--text-muted); }
+
+/* History section */
+.history-section { margin-top: 28px; }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-item { display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; }
+.history-item .text-muted { color:var(--text-muted); font-size:13px; }
+.history-actions button { margin-left: 12px; }
 @font-face {
   font-family: "SF Pro Text";
   font-style: normal;

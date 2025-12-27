@@ -7,6 +7,7 @@ import { getTrialsRemaining, getTierInfo, getTrialsLimit } from "@/lib/access-co
 import dynamic from 'next/dynamic';
 
 const SignIn = dynamic(() => import('@clerk/nextjs').then(mod => mod.SignIn), { ssr: false });
+import { getDebateHistory, clearDebateHistory } from '@/lib/debate-history';
 
 interface DebateStats {
   totalDebates: number;
@@ -30,6 +31,8 @@ export default function DashboardPage() {
   const [trialsRemaining, setTrialsRemaining] = useState<number | null>(null);
   const [trialsLimit, setTrialsLimit] = useState<number>(5);
   const [tierName, setTierName] = useState<string>('Free');
+  const [debateHistory, setDebateHistory] = useState<any[]>([]);
+  const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -50,6 +53,13 @@ export default function DashboardPage() {
       setTierName(tier.displayName);
       setTrialsLimit(limit);
       setTrialsRemaining(remaining);
+      // Load debate history
+      try {
+        const history = getDebateHistory(userId);
+        setDebateHistory(history);
+      } catch (err) {
+        console.error('Error loading debate history:', err);
+      }
     }
   }, [user]);
 
@@ -60,6 +70,36 @@ export default function DashboardPage() {
           <div className="spinner-dot"></div>
           <div className="spinner-dot"></div>
           <div className="spinner-dot"></div>
+        </div>
+
+        <div className="history-section">
+          <h2>Debate History</h2>
+          {debateHistory.length === 0 ? (
+            <p className="text-muted">No past debates recorded yet.</p>
+          ) : (
+            <div className="history-list">
+              {debateHistory.map((rec, idx) => (
+                <div key={rec.id} className="history-item">
+                  <div>
+                    <strong>{rec.topic}</strong>
+                    <div className="text-muted">{new Date(rec.date).toLocaleString()} — {rec.type.toUpperCase()} — {rec.rounds} rounds</div>
+                  </div>
+                  <div className="history-actions">
+                    <button className="btn-secondary" onClick={() => setSelectedRecord(rec)}>View Transcript</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {debateHistory.length > 0 && (
+            <div style={{marginTop:12}}>
+              <button className="btn-secondary" onClick={() => {
+                if (!user) return;
+                clearDebateHistory(user.id);
+                setDebateHistory([]);
+              }}>Clear History</button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -281,6 +321,24 @@ export default function DashboardPage() {
             </div>
             <h2>Start Your Debate Journey!</h2>
             <p>You haven't participated in any debates yet. Choose a mode above to get started!</p>
+          </div>
+        )}
+
+        {selectedRecord && (
+          <div className="modal-overlay" role="dialog" aria-modal="true">
+            <div className="modal-backdrop" onClick={() => setSelectedRecord(null)} />
+            <div className="modal-card">
+              <button className="modal-close" onClick={() => setSelectedRecord(null)} aria-label="Close">✕</button>
+              <h3 className="modal-title">Transcript — {selectedRecord.topic}</h3>
+              <div className="transcript-section">
+                {selectedRecord.transcript.map((entry: any, i: number) => (
+                  <div key={i} className={`transcript-entry ${entry.speaker === 'You' ? 'user' : 'ai'}`}>
+                    <strong>Round {entry.round} — {entry.speaker}</strong>
+                    <p>{entry.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
