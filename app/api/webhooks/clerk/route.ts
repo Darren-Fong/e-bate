@@ -40,7 +40,8 @@ export async function POST(req: Request) {
   // Handle user.created event - auto-assign free tier
   if (evt.type === "user.created") {
     try {
-      await clerkClient.users.updateUserMetadata(evt.data.id, {
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(evt.data.id, {
         publicMetadata: {
           tier: "free"
         }
