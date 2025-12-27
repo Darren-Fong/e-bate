@@ -30,14 +30,18 @@ export default function Home() {
 
       <section className="about-section">
         <h2>About E‑Bate</h2>
+        <br></br>
+        <br></br>
         <p>
           Welcome to E‑Bate — an online debate training platform with integrated AI coaching. E‑Bate helps learners practice and improve their debating skills without needing another person to train with, by providing structured practice rounds, AI-generated rebuttals, and targeted feedback.
         </p>
+        <br></br>
         <p>
           I’m an aspiring Computer Science student from Hong Kong with experience in Model United Nations. I built E‑Bate to make accessible, practical debate training available to anyone interested in improving their argumentation and public speaking.
         </p>
+        <br></br>
         <p>
-          This project is currently under active development. If you’d like to collaborate, contribute, or share feedback, please visit the <Link href="/contact">Contact</Link> page — I’d love to hear from you.
+          This project is currently under active development. If you’d like to collaborate or contribute, please visit the <Link href="/contact">Contact</Link> page — I’d love to hear from you. If you have some feedback after using the platform, please share it via the <Link href="/feedback">Feedback</Link> page.
         </p>
       </section>
     </div>
