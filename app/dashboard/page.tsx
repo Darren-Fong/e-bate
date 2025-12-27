@@ -277,6 +277,36 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <div className="history-section">
+          <h2>Debate History</h2>
+          {debateHistory.length === 0 ? (
+            <p className="text-muted">No past debates recorded yet.</p>
+          ) : (
+            <div className="history-list">
+              {debateHistory.map((rec) => (
+                <div key={rec.id} className="history-item">
+                  <div>
+                    <strong>{rec.topic}</strong>
+                    <div className="text-muted">{new Date(rec.date).toLocaleString()} — {rec.type.toUpperCase()} — {rec.rounds} rounds</div>
+                  </div>
+                  <div className="history-actions">
+                    <button className="btn-secondary" onClick={() => setSelectedRecord(rec)}>View Transcript</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {debateHistory.length > 0 && (
+            <div style={{marginTop:12}}>
+              <button className="btn-secondary" onClick={() => {
+                if (!user) return;
+                clearDebateHistory(user.id as string);
+                setDebateHistory([]);
+              }}>Clear History</button>
+            </div>
+          )}
+        </div>
+
         {stats.totalDebates === 0 && (
           <div className="empty-state">
             <div className="empty-icon">
@@ -304,6 +334,31 @@ export default function DashboardPage() {
                     <p>{entry.text}</p>
                   </div>
                 ))}
+
+                {selectedRecord.feedback && (
+                  <div style={{marginTop:14}}>
+                    <h4>AI Feedback</h4>
+                    {selectedRecord.feedback.score !== undefined && (
+                      <p><strong>Score:</strong> {selectedRecord.feedback.score}</p>
+                    )}
+                    {selectedRecord.feedback.strengths && selectedRecord.feedback.strengths.length > 0 && (
+                      <div>
+                        <strong>Strengths:</strong>
+                        <ul>
+                          {selectedRecord.feedback.strengths.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedRecord.feedback.improvements && selectedRecord.feedback.improvements.length > 0 && (
+                      <div>
+                        <strong>Improvements:</strong>
+                        <ul>
+                          {selectedRecord.feedback.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
