@@ -5,11 +5,29 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import ThemeToggle from "./ThemeToggle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    // Prevent body scroll when mobile nav is open
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    if (open) window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
     <nav className="navbar">
@@ -23,7 +41,14 @@ export default function Navbar() {
             priority
           />
         </Link>
-        <button className="navbar-menu-btn" aria-label="Menu" onClick={() => setOpen(true)}>☰</button>
+        <button
+          className="navbar-menu-btn"
+          aria-label="Menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          ☰
+        </button>
         <div className="navbar-links">
           <Link 
             href="/" 
