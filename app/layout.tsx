@@ -18,6 +18,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "E-Bate - AI-Powered Debate Platform",
   description: "Practice your debate skills with AI or compete in real-time debates with others",
+  icons: {
+    icon: [
+      { url: '/e-bate-favicon.png' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: '/e-bate-favicon.png',
+  },
 };
 
 export default function RootLayout({
