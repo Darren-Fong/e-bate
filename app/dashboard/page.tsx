@@ -92,10 +92,10 @@ export default function DashboardPage() {
             </div>
           )}
           {debateHistory.length > 0 && (
-            <div style={{marginTop:12}}>
+              <div style={{marginTop:12}}>
               <button className="btn-secondary" onClick={() => {
                 if (!user) return;
-                clearDebateHistory(user.id);
+                clearDebateHistory(user.id as string);
                 setDebateHistory([]);
               }}>Clear History</button>
             </div>
