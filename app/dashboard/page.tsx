@@ -1,5 +1,3 @@
-"use client";
-
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -70,36 +68,6 @@ export default function DashboardPage() {
           <div className="spinner-dot"></div>
           <div className="spinner-dot"></div>
           <div className="spinner-dot"></div>
-        </div>
-
-        <div className="history-section">
-          <h2>Debate History</h2>
-          {debateHistory.length === 0 ? (
-            <p className="text-muted">No past debates recorded yet.</p>
-          ) : (
-            <div className="history-list">
-              {debateHistory.map((rec, idx) => (
-                <div key={rec.id} className="history-item">
-                  <div>
-                    <strong>{rec.topic}</strong>
-                    <div className="text-muted">{new Date(rec.date).toLocaleString()} — {rec.type.toUpperCase()} — {rec.rounds} rounds</div>
-                  </div>
-                  <div className="history-actions">
-                    <button className="btn-secondary" onClick={() => setSelectedRecord(rec)}>View Transcript</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          {debateHistory.length > 0 && (
-              <div style={{marginTop:12}}>
-              <button className="btn-secondary" onClick={() => {
-                if (!user) return;
-                clearDebateHistory(user.id as string);
-                setDebateHistory([]);
-              }}>Clear History</button>
-            </div>
-          )}
         </div>
       </div>
     );
