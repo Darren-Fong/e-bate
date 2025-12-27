@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: "E-Bate Contact <onboarding@resend.dev>",
+        from: process.env.RESEND_FROM_EMAIL || "E-Bate Contact <onboarding@resend.dev>",
         to: [process.env.CONTACT_EMAIL || "your-email@example.com"],
         subject: `E-Bate Contact: ${subject}`,
         reply_to: email,
