@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     // Prevent body scroll when mobile nav is open
@@ -28,6 +29,13 @@ export default function Navbar() {
     if (open) window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   return (
     <nav className="navbar">
@@ -49,7 +57,8 @@ export default function Navbar() {
         >
           ☰
         </button>
-        <div className="navbar-links">
+        {!isMobile && (
+          <div className="navbar-links">
           <Link 
             href="/" 
             className={`navbar-link ${pathname === "/" ? "active" : ""}`}
@@ -99,7 +108,8 @@ export default function Navbar() {
           </SignedIn>
           
           <ThemeToggle />
-        </div>
+          </div>
+        )}
         {open && (
           <div className="mobile-nav-overlay" onClick={() => setOpen(false)}>
             <div className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
