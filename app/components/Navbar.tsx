@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import ThemeToggle from "./ThemeToggle";
+import { useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   return (
     <nav className="navbar">
@@ -21,6 +23,7 @@ export default function Navbar() {
             priority
           />
         </Link>
+        <button className="navbar-menu-btn" aria-label="Menu" onClick={() => setOpen(true)}>☰</button>
         <div className="navbar-links">
           <Link 
             href="/" 
@@ -72,6 +75,26 @@ export default function Navbar() {
           
           <ThemeToggle />
         </div>
+        {open && (
+          <div className="mobile-nav-overlay" onClick={() => setOpen(false)}>
+            <div className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setOpen(false)} aria-label="Close">✕</button>
+              <nav>
+                <Link href="/" className="navbar-link">Home</Link>
+                <Link href="/modes" className="navbar-link">Modes</Link>
+                <Link href="/dashboard" className="navbar-link">Dashboard</Link>
+                <Link href="/feedback" className="navbar-link">Feedback</Link>
+                <Link href="/contact" className="navbar-link">Contact</Link>
+                <SignedOut>
+                  <SignInButton mode="redirect"><button className="navbar-login-btn">Login</button></SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+              </nav>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

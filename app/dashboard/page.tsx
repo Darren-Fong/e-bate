@@ -132,7 +132,7 @@ export default function DashboardPage() {
         <div className="stats-grid">
           <div className="stat-card highlight">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <svg width="36" height="36" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" />
                 <rect x="9" y="7" width="4" height="14" rx="1" fill="currentColor" />
                 <rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor" />
@@ -146,7 +146,7 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+              <svg width="36" height="36" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
                 <rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.4" />
                 <circle cx="8.5" cy="10" r="1.2" fill="currentColor" />
                 <circle cx="15.5" cy="10" r="1.2" fill="currentColor" />
@@ -161,7 +161,7 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+              <svg width="36" height="36" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
                 <path d="M3 21l8-8M21 3l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M7 7l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M14 14l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -175,7 +175,7 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+              <svg width="36" height="36" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
                 <circle cx="9" cy="9" r="2.2" fill="currentColor" />
                 <path d="M4 18c1.5-2 4-3 5-3s3.5 1 5 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="17" cy="8" r="1.8" fill="currentColor" />
@@ -190,7 +190,7 @@ export default function DashboardPage() {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+              <svg width="36" height="36" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
                 <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.4" />
                 <path d="M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
                 <rect x="7" y="9" width="10" height="6" rx="1" fill="currentColor" opacity="0.06" />
