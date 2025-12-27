@@ -109,7 +109,7 @@ export default function DebugTrials() {
           <p><strong>User ID:</strong> {user.id}</p>
           <p><strong>Email:</strong> {user.primaryEmailAddress?.emailAddress}</p>
           <p><strong>Tier:</strong> {tierName} <span style={{color: 'var(--text-secondary)'}}>({tierType})</span></p>
-          <p><strong>Access Level:</strong> {isUnlimitedUser ? '✨ Unlimited Access' : `🎯 Limited (${trialsLimit} debates)`}</p>
+          <p><strong>Access Level:</strong> {isUnlimitedUser ? '✨ Admin Access' : `🎯 Limited (${trialsLimit} debates)`}</p>
         </div>
 
         <h2>All Available Tiers</h2>
@@ -126,7 +126,7 @@ export default function DebugTrials() {
               alignItems: 'center'
             }}>
               <span><strong>{tier.displayName}</strong> ({key})</span>
-              <span>{tier.limit === Infinity ? '∞ Unlimited' : `${tier.limit} debates`}</span>
+              <span>{tier.limit === Infinity ? '∞ Admin' : `${tier.limit} debates`}</span>
               {tierType === key && <span>✓ Your Tier</span>}
             </div>
           ))}
@@ -135,7 +135,7 @@ export default function DebugTrials() {
         <h2>Trial Usage</h2>
         <div style={{marginBottom: '20px'}}>
           <p><strong>Trials Used:</strong> {trialsUsed}</p>
-          <p><strong>Trials Remaining:</strong> {isUnlimitedUser ? '∞ (Unlimited)' : `${trialsRemaining} / ${trialsLimit}`}</p>
+          <p><strong>Trials Remaining:</strong> {isUnlimitedUser ? '∞ (Admin)' : `${trialsRemaining} / ${trialsLimit}`}</p>
         </div>
 
         <div style={{display: 'flex', gap: '10px', marginBottom: '30px'}}>
@@ -181,7 +181,7 @@ export default function DebugTrials() {
           <li>Start AI debates to consume trials</li>
           <li>Check the browser console (F12) for detailed logging</li>
           <li>Use "Reset My Trials" button to test again</li>
-          <li>Free tier: 5 debates, Basic: 20 debates, Pro: 50 debates, Unlimited: ∞</li>
+          <li>Free tier: 5 debates, Basic: 20 debates, Pro: 50 debates, Admin: ∞</li>
         </ol>
 
         <div style={{

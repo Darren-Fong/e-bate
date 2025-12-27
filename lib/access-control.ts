@@ -2,7 +2,7 @@
 // Tiers are stored in user.publicMetadata.tier in Clerk
 // Auto-assigned via webhook on signup, editable via Clerk Dashboard
 
-export type TierType = 'free' | 'basic' | 'pro' | 'unlimited';
+export type TierType = 'free' | 'basic' | 'pro' | 'admin';
 
 export interface Tier {
   name: string;
@@ -27,10 +27,10 @@ export const TIERS: Record<TierType, Tier> = {
     limit: 50,
     displayName: 'Pro'
   },
-  unlimited: {
-    name: 'unlimited',
+  admin: {
+    name: 'admin',
     limit: Infinity,
-    displayName: 'Unlimited'
+    displayName: 'Admin'
   }
 };
 
@@ -49,7 +49,7 @@ export function getTierInfo(userMetadata: any): Tier {
 }
 
 export function isUnlimited(userMetadata: any): boolean {
-  return getUserTier(userMetadata) === 'unlimited';
+  return getUserTier(userMetadata) === 'admin';
 }
 
 // Legacy function for backward compatibility

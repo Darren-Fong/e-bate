@@ -96,7 +96,7 @@ export default function DashboardPage() {
               {trialsRemaining !== null && (
                 <p className="dashboard-trials">
                   {trialsLimit === Infinity ? (
-                    <>✨ <strong>{tierName}</strong> Access - Unlimited AI Practice</>
+                    <>✨ <strong>{tierName}</strong> Access - Admin AI Practice</>
                   ) : (
                     <>🎯 <strong>{tierName}</strong> tier: <strong>{trialsRemaining}</strong> / {trialsLimit} AI Practice rounds</>
                   )}

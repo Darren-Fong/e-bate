@@ -42,7 +42,7 @@ export default function AIDebate() {
       
       // Debug logging
       console.log(`[AI Debate] User: ${user.primaryEmailAddress?.emailAddress}`);
-      console.log(`[AI Debate] Tier: ${tier.displayName} (${limit === Infinity ? 'Unlimited' : `${limit} debates`})`);
+      console.log(`[AI Debate] Tier: ${tier.displayName} (${limit === Infinity ? 'Admin' : `${limit} debates`})`);
       console.log(`[AI Debate] Trials remaining: ${remaining === Infinity ? '∞' : `${remaining}/${limit}`}`);
       console.log(`[AI Debate] Has access: ${access}`);
     }
@@ -50,7 +50,7 @@ export default function AIDebate() {
 
   const startDebate = () => {
     if (topic.trim()) {
-      // Increment trial count for non-unlimited users
+      // Increment trial count for non-admin users
       if (user?.id) {
         const metadata = user.publicMetadata;
         
@@ -244,7 +244,7 @@ export default function AIDebate() {
               
               {trialsLimit === Infinity && (
                 <div className="trial-notice" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-                  <p>✨ {tierName} Access: <strong>Unlimited</strong> practice rounds</p>
+                  <p>✨ {tierName} Access: <strong>Admin</strong> practice rounds</p>
                 </div>
               )}
               
